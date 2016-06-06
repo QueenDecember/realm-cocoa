@@ -141,3 +141,8 @@ class SwiftLinkTargetObject: RLMObject {
         return ["backlinks": RLMPropertyDescriptor(withClass: SwiftLinkSourceObject.self, propertyName: "link")]
     }
 }
+
+class SwiftIgnoredLazyVarObject : RLMObject {
+    dynamic lazy var ignoredVar = ""
+    override class func ignoredProperties() -> [String] { return ["ignoredVar"] }
+}

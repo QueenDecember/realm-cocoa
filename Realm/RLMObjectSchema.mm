@@ -171,6 +171,21 @@ using namespace realm;
     return schema;
 }
 
++ (bool)_isInvalidLazyProperty:(NSString *)propertyName ignoredProps:(NSArray *)ignoredProperties {
+    NSString *const storageSuffix = @".storage";
+    const NSUInteger suffixLength = [storageSuffix length];
+    if (![ignoredProperties containsObject:propertyName]
+        && [propertyName length] > suffixLength
+        && [propertyName hasSuffix:storageSuffix]) {
+        // Snip the name
+        NSString *snippedName = [propertyName substringToIndex:[propertyName length] - suffixLength];
+        if (![ignoredProperties containsObject:snippedName]) {
+            return true;
+        }
+    }
+    return false;
+}
+
 + (NSArray *)propertiesForClass:(Class)objectClass isSwift:(bool)isSwiftClass {
     Class objectUtil = [objectClass objectUtilClass:isSwiftClass];
     NSArray *ignoredProperties = [objectUtil ignoredPropertiesForClass:objectClass];
@@ -267,6 +282,12 @@ using namespace realm;
             }
             if (auto type = RLMCoerceToNil(propertyType)) {
                 if (existing == NSNotFound) {
+                    // Check to see if this optional property is an underlying storage property for a Swift lazy var.
+                    // Managed lazy vars are't allowed.
+                    // NOTE: Revisit this once property behaviors are implemented in Swift.
+                    if ([self _isInvalidLazyProperty:propertyName ignoredProps:ignoredProperties]) {
+                        @throw RLMException(@"Lazy managed properties are not allowed on Realm Swift object classes.");
+                    }
                     property = [[RLMProperty alloc] initSwiftOptionalPropertyWithName:propertyName
                                                                               indexed:[indexed containsObject:propertyName]
                                                                                  ivar:class_getInstanceVariable(objectClass, propertyName.UTF8String)
