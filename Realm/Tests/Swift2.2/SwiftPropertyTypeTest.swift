@@ -104,6 +104,14 @@ class SwiftPropertyTypeTest: RLMTestCase {
         XCTAssertEqual(obj.int64, v64)
     }
 
+    func testLazyVarProperties() {
+        let realm = realmWithTestPath()
+        let succeeded : Void? = try? realm.transactionWithBlock() {
+            realm.addObject(SwiftLazyVarObject())
+        }
+        XCTAssertNotNil(succeeded, "Writing an NSObject-based object with an lazy property should work.")
+    }
+
     func testIgnoredLazyVarProperties() {
         let realm = realmWithTestPath()
         let succeeded : Void? = try? realm.transactionWithBlock() {

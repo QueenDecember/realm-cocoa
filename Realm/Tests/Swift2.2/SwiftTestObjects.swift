@@ -142,7 +142,11 @@ class SwiftLinkTargetObject: RLMObject {
     }
 }
 
+class SwiftLazyVarObject : RLMObject {
+    dynamic lazy var lazyProperty : String = "hello world"
+}
+
 class SwiftIgnoredLazyVarObject : RLMObject {
-    dynamic lazy var ignoredVar = ""
+    dynamic lazy var ignoredVar : String = "hello world"
     override class func ignoredProperties() -> [String] { return ["ignoredVar"] }
 }
