@@ -171,13 +171,15 @@ using namespace realm;
     return schema;
 }
 
-+ (bool)_isInvalidLazyProperty:(NSString *)propertyName ignoredProps:(NSArray *)ignoredProperties {
++ (bool)_isDisallowedLazyProperty:(NSString *)propertyName ignoredProps:(NSArray *)ignoredProperties {
+    // A Swift lazy var shows up as two separate children on the reflection tree: one named 'x', and another that is
+    // optional and is named 'x.storage'. Note that '.' is illegal in either a Swift or Objective-C property name.
     NSString *const storageSuffix = @".storage";
     const NSUInteger suffixLength = [storageSuffix length];
     if (![ignoredProperties containsObject:propertyName]
         && [propertyName length] > suffixLength
         && [propertyName hasSuffix:storageSuffix]) {
-        // Snip the name
+        // Recover the original name (sans suffix)
         NSString *snippedName = [propertyName substringToIndex:[propertyName length] - suffixLength];
         if (![ignoredProperties containsObject:snippedName]) {
             return true;
@@ -285,7 +287,7 @@ using namespace realm;
                     // Check to see if this optional property is an underlying storage property for a Swift lazy var.
                     // Managed lazy vars are't allowed.
                     // NOTE: Revisit this once property behaviors are implemented in Swift.
-                    if ([self _isInvalidLazyProperty:propertyName ignoredProps:ignoredProperties]) {
+                    if ([self _isDisallowedLazyProperty:propertyName ignoredProps:ignoredProperties]) {
                         @throw RLMException(@"Lazy managed properties are not allowed on Realm Swift object classes.");
                     }
                     property = [[RLMProperty alloc] initSwiftOptionalPropertyWithName:propertyName
