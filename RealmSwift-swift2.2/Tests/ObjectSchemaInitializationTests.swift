@@ -279,11 +279,11 @@ class SwiftObjectWithNonRealmOptionalType: SwiftFakeObject {
     let set = RealmOptional<Set<Int>>()
 }
 
-class RealmObjectWithLazyVar : SwiftFakeObject {
+class RealmObjectWithLazyVar: SwiftFakeObject {
     dynamic lazy var someVar = ""
 }
 
-class RealmObjectWithIgnoredLazyVar : Object {
+class RealmObjectWithIgnoredLazyVar: Object {
     dynamic lazy var ignoredVar = ""
     dynamic override class func ignoredProperties() -> [String] { return ["ignoredVar"] }
 }
