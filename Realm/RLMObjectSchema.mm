@@ -175,15 +175,9 @@ using namespace realm;
     // A Swift lazy var shows up as two separate children on the reflection tree: one named 'x', and another that is
     // optional and is named 'x.storage'. Note that '.' is illegal in either a Swift or Objective-C property name.
     NSString *const storageSuffix = @".storage";
-    const NSUInteger suffixLength = [storageSuffix length];
-    if (![ignoredProperties containsObject:propertyName]
-        && [propertyName length] > suffixLength
-        && [propertyName hasSuffix:storageSuffix]) {
-        // Recover the original name (sans suffix)
-        NSString *snippedName = [propertyName substringToIndex:[propertyName length] - suffixLength];
-        if (![ignoredProperties containsObject:snippedName]) {
-            return true;
-        }
+    if ([propertyName hasSuffix:storageSuffix]) {
+        NSString *snippedName = [propertyName substringToIndex:propertyName.length - storageSuffix.length];
+        return ![ignoredProperties containsObject:snippedName];
     }
     return false;
 }
